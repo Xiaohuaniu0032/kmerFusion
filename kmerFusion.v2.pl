@@ -76,7 +76,7 @@ print RUNSH "$cmd\n";
 # get fusion result from json file
 my $json = "$outdir/$sampleName\.genefuse.json";
 $cmd = "perl $Bin/bin/get_final_fusion_result.pl $json $sampleName $outdir";
-system($cmd);
+#system($cmd);
 print RUNSH "$cmd\n";
 
 # stat genefuse result info
