@@ -33,7 +33,7 @@ foreach my $chr (keys %info){
 		if ($n >= $fcount){ # >= 2
 			# effective pos
 			$flag += 1;
-			print "POS $pos is a OK sv pos\n";
+			#print "POS $pos is a OK sv pos\n";
 			my $start_pos = $pos - 1; # 0-based
 			my $end_pos = $pos;
 			my $flag_new = "POS".$flag;
