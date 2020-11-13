@@ -4,6 +4,8 @@ detect DNA fusion using **`genefuse`** software, which is a DNA fusion caller ba
 ## Usage
 `perl /path/kmerFusion/kmerFusion.pl -bam <bam> -n <name> -od <outdir>`
 
+### parameter spec
+
 `-bam`: tumor bam file
 
 `-n`: tumor name
