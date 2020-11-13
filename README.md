@@ -83,6 +83,7 @@ detect DNA fusion using **`genefuse`** software, which is a DNA fusion caller ba
 * `kmer` method is a simple and direct mehtod to detect DNA fusion
 * `genefuse` is a good kmer-based DNA fusion caller, and its visualizing function is very powerful and useful
 
-
+## Software Needed
+*you need to add `samtools` and `bedtools` binary path in your Linux PATH env*
 
 
