@@ -7,7 +7,7 @@ my $gene_bed_file = "$outdir/all.gene.bed";
 
 # link ENST and gene name
 my %enst2gene;
-open IN, "$cosmicGeneFile" or die;
+open IN, "gunzip -dc $cosmicGeneFile |" or die;
 while (<IN>){
 	chomp;
 	my @arr = split /\t/;
@@ -17,7 +17,7 @@ close IN;
 
 open O, ">$gene_bed_file" or die;
 # use ENST to get gene name, and its region
-open IN, "$ensGeneAnnotFile" or die;
+open IN, "gunzip -dc $ensGeneAnnotFile |" or die;
 while (<IN>){
 	chomp;
 	my @arr = split /\t/;
@@ -28,7 +28,7 @@ while (<IN>){
 		$chr =~ s/^chr//;
 	}
 
-	if (exists $enst2gene{$$enst}){
+	if (exists $enst2gene{$enst}){
 		my $gene_name = $enst2gene{$enst};
 		my $gene_start = $arr[4];
 		my $gene_end = $arr[5];

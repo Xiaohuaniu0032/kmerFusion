@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-my ($cosmicGeneFile,$ensGeneAnnotFile,$softclipPosPASSAnnotGeneFile,$chrname,$outdir) = @ARGV;
+my ($cosmicGeneFile,$ensGeneAnnotFile,$softclipPosPASSAnnotGeneFile,$chrname,$padding_len,$outdir) = @ARGV;
 
 # link enst with gene name
 my %gene2enst;
-open IN, "$cosmicGeneFile" or die;
+open IN, "gunzip -dc $cosmicGeneFile |" or die;
 while (<IN>){
 	chomp;
 	my @arr = split /\t/;
@@ -17,7 +17,7 @@ close IN;
 my %enstExonAnnotInfo;
 my %enst_chr;
 
-open IN, "$ensGeneAnnotFile" or die;
+open IN, "gunzip -dc $ensGeneAnnotFile |" or die;
 while (<IN>){
 	chomp;
 	my @arr = split /\t/;
@@ -32,10 +32,10 @@ while (<IN>){
 	$enst_chr{$enst} = $chr; # chr for fusion csv file
 	
 	my $start_exon = $arr[-7];
-	$start_exon =~ s/\,//;
+	$start_exon =~ s/\,$//;
 
 	my $end_exon = $arr[-6];
-	$end_exon =~ s/\,//;
+	$end_exon =~ s/\,$//;
 	
 	my @start_exon = split /\,/, $start_exon;
 	my @end_exon = split /\,/, $end_exon;
