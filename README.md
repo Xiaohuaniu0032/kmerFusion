@@ -24,19 +24,18 @@ detect DNA fusion using **`genefuse`** software, which is a DNA fusion caller ba
 ### output files
 ```
 -rw-rw-r-- 1 fulongfei fulongfei     477849 11月 13 09:37 all.gene.bed
--rw-rw-r-- 1 fulongfei fulongfei     473588 11月 13 09:58 fusion.csv
--rw-rw-r-- 1 fulongfei fulongfei       2385 11月 13 09:41 gfuse.ZZ20052708_CL01156.sh
+-rw-rw-r-- 1 fulongfei fulongfei    3234591 11月 13 15:53 fusion.csv
+-rw-rw-r-- 1 fulongfei fulongfei       2328 11月 13 15:53 gfuse.ZZ20052708_CL01156.sh
 -rw-rw-r-- 1 fulongfei fulongfei        176 11月 13 09:17 run.sh
+-rw-rw-r-- 1 fulongfei fulongfei   18980591 11月 13 15:51 softclip.pos.PASS_FILTER.Annot_Genes.txt
+-rw-rw-r-- 1 fulongfei fulongfei   13887873 11月 13 15:48 softclip.pos.PASS_FILTER.txt
+-rw-rw-r-- 1 fulongfei fulongfei   28015211 11月 13 15:47 softclip.pos.txt
 -rw-rw-r-- 1 fulongfei fulongfei       8673 11月 13 10:43 ZZ20052708_CL01156.fusion.xls
 -rw-rw-r-- 1 fulongfei fulongfei    3503730 11月 13 10:14 ZZ20052708_CL01156.genefuse.html
 -rw-rw-r-- 1 fulongfei fulongfei     279516 11月 13 10:14 ZZ20052708_CL01156.genefuse.json
 -rw-rw-r-- 1 fulongfei fulongfei 3008045788 11月 13 09:32 ZZ20052708_CL01156.R1.fastq
 -rw-rw-r-- 1 fulongfei fulongfei 3015106236 11月 13 09:32 ZZ20052708_CL01156.R2.fastq
--rw-rw-r-- 1 fulongfei fulongfei    9744065 11月 13 09:38 ZZ20052708_CL01156.softclip.pos.PASS.annot.Gene.txt
--rw-rw-r-- 1 fulongfei fulongfei    6087198 11月 13 09:34 ZZ20052708_CL01156.softclip.pos.PASS_FILTER.txt
--rw-rw-r-- 1 fulongfei fulongfei   29931354 11月 13 09:34 ZZ20052708_CL01156.softclip.pos.txt
--rw-rw-r-- 1 fulongfei fulongfei 1631348801 11月 13 09:29 ZZ20052708_CL01156.sort_by_name.bam
-```
+-rw-rw-r-- 1 fulongfei fulongfei 1631348801 11月 13 09:29 ZZ20052708_CL01156.sort_by_name.bam```
 
 ### file spec
 
@@ -46,11 +45,11 @@ detect DNA fusion using **`genefuse`** software, which is a DNA fusion caller ba
 
 `*.R2.fastq`: fastq R2 converted from `*.sort_by_name.bam`
 
-`*.softclip.pos.txt`: soft clip pos
+`softclip.pos.txt`: soft clip pos
 
-`*.softclip.pos.PASS_FILTER.txt`: soft clip pos after filter by support count
+`softclip.pos.PASS_FILTER.txt`: soft clip pos after filter by support count
 
-`*.softclip.pos.PASS.annot.Gene.txt`: soft clip pos annot with gene name by bedtools intersect
+`softclip.pos.PASS_FILTER.Annot_Genes.txt`: soft clip pos annot with gene name by bedtools intersect
 
 `fusion.csv`: fusion gene list used by `genefuse` to search
 
