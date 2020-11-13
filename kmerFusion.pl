@@ -58,12 +58,13 @@ print RUNSH "$cmd\n";
 # annot soft clip pos with gene name using bedtools
 my $all_gene_bed = "$outdir/all.gene.bed";
 my $pass_filter_pos_file = "$outdir/softclip.pos.PASS_FILTER.txt";
-$cmd = "bedtools intersect -a $pass_filter_pos_file -b $all_gene_bed -wo -bed >$outdir/$sampleName\.softclip.pos.PASS.annot.Gene.txt";
+my $annot_pos_file = "$outdir/softclip.pos.PASS_FILTER.Annot_Genes.txt";
+$cmd = "bedtools intersect -a $pass_filter_pos_file -b $all_gene_bed -wo -bed >$annot_pos_file";
 #system($cmd);
 print RUNSH "$cmd\n";
 
 # make fusion csv file
-$cmd = "perl $Bin/bin/make_fusion_list.pl $cosmicGene $ensGeneAnnot $outdir/$sampleName\.softclip.pos.PASS.annot.Gene.txt $chr_naming $padding_len $outdir";
+$cmd = "perl $Bin/bin/make_fusion_list.pl $cosmicGene $ensGeneAnnot $annot_pos_file $chr_naming $padding_len $outdir";
 #system($cmd);
 print RUNSH "$cmd\n";
 
