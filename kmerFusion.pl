@@ -34,13 +34,15 @@ my $cmd = "perl $Bin/bin/bam2fq.pl $bam $sampleName $outdir";
 print RUNSH "$cmd\n";
 
 # get soft-clip region info
-my $soft_clip_pos_file = "$outdir/$sampleName\.softclip.pos.txt";
-$cmd = "samtools view $bam | awk '\$6~/S/ {print \$3\"\\t\"\$4}\' >$soft_clip_pos_file";
+$cmd = "python $Bin/bin/get_soft_clip_pos.py -bam $bam -od $outdir";
+#my $soft_clip_pos_file = "$outdir/$sampleName\.softclip.pos.txt";
+#$cmd = "samtools view $bam | awk '\$6~/S/ {print \$3\"\\t\"\$4}\' >$soft_clip_pos_file";
 #system($cmd);
 print RUNSH "$cmd\n";
 
 # filter soft clip pos
 # if a pos has <= 2 clip reads, then this pos will be filtered out
+my $soft_clip_pos_file = "$outdir/softclip.pos.txt";
 $cmd = "perl $Bin/bin/filter_sv_pos.pl $soft_clip_pos_file $sampleName $outdir";
 #system($cmd);
 print RUNSH "$cmd\n";
@@ -55,7 +57,7 @@ print RUNSH "$cmd\n";
 
 # annot soft clip pos with gene name using bedtools
 my $all_gene_bed = "$outdir/all.gene.bed";
-my $pass_filter_pos_file = "$outdir/$sampleName\.softclip.pos.PASS_FILTER.txt";
+my $pass_filter_pos_file = "$outdir/softclip.pos.PASS_FILTER.txt";
 $cmd = "bedtools intersect -a $pass_filter_pos_file -b $all_gene_bed -wo -bed >$outdir/$sampleName\.softclip.pos.PASS.annot.Gene.txt";
 #system($cmd);
 print RUNSH "$cmd\n";
