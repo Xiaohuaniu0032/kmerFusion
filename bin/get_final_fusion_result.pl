@@ -3,11 +3,12 @@ use warnings;
 
 my ($json,$name,$outdir) = @ARGV;
 
-my $cmd = "less $json | grep \"Fusion\" | grep -v \"command\" >$outdir/fusion.result.tmp\.$name";
+my $fusion_result_tmp = "$outdir/fusion.result.tmp\.$name\.xls";
+my $cmd = "less $json | grep \"Fusion\" | grep -v \"command\" >$fusion_result_tmp";
 system($cmd);
 
-my $fusion_result_tmp = "$outdir/fusion.result.tmp\.$name";
-my $final_result = "$outdir/fusion.result.final\.$name";
+#my $fusion_result_tmp = "$outdir/fusion.result.tmp\.$name\.xls";
+my $final_result = "$outdir/$name\.fusion.xls";
 open O, ">$final_result" or die;
 #print O "gene1\tgene1_chr\tgene1_breakpoint\tgene1_annot_region\tgene1_ENST\tgene2\tgene2_chr\tgene2_breakpoint\tgene2_annot_region\tgene2_ENST\ttotal_support_reads\tuniq_support_reads\n";
 print O "fusion_info\ttotal_support_reads\tuniq_support_reads\n";
@@ -15,12 +16,11 @@ print O "fusion_info\ttotal_support_reads\tuniq_support_reads\n";
 open IN, "$fusion_result_tmp" or die;
 while (<IN>){
 	chomp;
-	my $fusion_info = (split /\s+/, $_)[1];
-	if (/.*\(total: (\d+)\, unique: (\d+)\)/){
-		my $total_n = $1;
-		my $uniq_n = $2;
-		print O "$fusion_info\t$total_n\t$uniq_n\n";
+	#print "$_\n";
+	if (/Fusion: (.+)\s+\(total: (\d+)\, unique:(\d+)\)/){
+		print O "$1\t$2\t$3\n";
 	}
 }
 close IN;
 close O;
+`rm $fusion_result_tmp`;
