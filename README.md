@@ -35,7 +35,8 @@ detect DNA fusion using **`genefuse`** software, which is a DNA fusion caller ba
 -rw-rw-r-- 1 fulongfei fulongfei     279516 11月 13 10:14 ZZ20052708_CL01156.genefuse.json
 -rw-rw-r-- 1 fulongfei fulongfei 3008045788 11月 13 09:32 ZZ20052708_CL01156.R1.fastq
 -rw-rw-r-- 1 fulongfei fulongfei 3015106236 11月 13 09:32 ZZ20052708_CL01156.R2.fastq
--rw-rw-r-- 1 fulongfei fulongfei 1631348801 11月 13 09:29 ZZ20052708_CL01156.sort_by_name.bam```
+-rw-rw-r-- 1 fulongfei fulongfei 1631348801 11月 13 09:29 ZZ20052708_CL01156.sort_by_name.bam
+```
 
 ### file spec
 
