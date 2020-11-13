@@ -15,7 +15,7 @@ while (<IN>){
 }
 close IN;
 
-my $outfile = "$outdir/$name\.softclip.pos.PASS_FILTER.txt";
+my $outfile = "$outdir/softclip.pos.PASS_FILTER.txt";
 open O, ">$outfile" or die;
 
 foreach my $chr (keys %info){
@@ -30,7 +30,7 @@ foreach my $chr (keys %info){
 	my $flag = 0;
 	foreach my $pos (sort {$a <=> $b} keys %rep_pos){
 		my $n = $rep_pos{$pos};
-		if ($n > $fcount){
+		if ($n >= $fcount){ # >= 2
 			# effective pos
 			$flag += 1;
 			print "POS $pos is a OK sv pos\n";
