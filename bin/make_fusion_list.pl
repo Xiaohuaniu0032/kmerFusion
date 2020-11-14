@@ -84,23 +84,83 @@ foreach my $gene (keys %genes){
 	my $enst = $gene2enst{$gene}; # get enst
 	my $chr = $enst_chr{$enst};
 	my @pos_sort = sort {$a <=> $b} keys %{$soft_clip_pos{$gene}};
-	
-	my $pos_sort_left = $pos_sort[0] - $padding_len; # extent soft clip pos to left 1k bp
-	my $pos_sort_right = $pos_sort[-1] + $padding_len; # extent soft clip pos to right 1k bp
-	
-	# print sv region for genefuse to search
-	print O "\>$gene\,$chr\:$pos_sort_left\-$pos_sort_right\n";
-	
-	# print all exon info
-	my @exon_sort = sort {$a <=> $b} keys %{$enstExonAnnotInfo{$enst}};
-	for my $e (@exon_sort){
-		my @r = split /\t/, $enstExonAnnotInfo{$enst}{$e};
-		print O "$e\,$r[0]\,$r[1]\n";
+
+	# if pos2 - pos1 > 2 * padding_len, then these two pos can not merge into one, otherwise, can merge into one new pos
+	my $merged_pos_aref = &merge_pos(\@pos_sort, $padding_len);
+
+	for my $pos (@{$merged_pos_aref}){
+		my ($pos_sort_left,$pos_sort_right);
+
+		if ($pos =~ /\_/){
+			# get first and last item
+			my @pos = split /\_/, $pos;
+			my $first_item = $pos[0];
+			my $last_item = $pos[-1];
+
+			$pos_sort_left = $first_item - $padding_len;
+			$pos_sort_right = $last_item + $padding_len;
+
+			if ($pos_sort_left <= 0){
+				$pos_sort_left = 1;
+			}
+		}else{
+			# single pos
+			$pos_sort_left = $pos - $padding_len;
+			$pos_sort_right = $pos + $padding_len;
+		}
+
+		if ($pos_sort_left <= 0){
+			$pos_sort_left = 1;
+		}
+
+		# print sv region for genefuse to search
+		print O "\>$gene\,$chr\:$pos_sort_left\-$pos_sort_right\n";
+
+		# print all exon info
+		my @exon_sort = sort {$a <=> $b} keys %{$enstExonAnnotInfo{$enst}};
+		for my $e (@exon_sort){
+			my @r = split /\t/, $enstExonAnnotInfo{$enst}{$e};
+			print O "$e\,$r[0]\,$r[1]\n";
+		}
+
+		print O "\n";
 	}
-	
-	print O "\n";
 }
+
 close O;
 
 
+sub merge_pos{
+	my ($aref, $gap_len) = @_;
+	my $new_gap_len = $gap_len + 100; # add a small value to avoid
+	my @new_pos;
+	my $first_pos = shift @{$aref};
+	push @new_pos, $first_pos;
+
+	for my $pos (@{$aref}){
+		my $former_pos = $new_pos[-1];
+		if ($former_pos =~ /\_/){
+			my $former_item = (split /\_/, $former_pos)[-1];
+			if ($pos - $former_item > 2 * $new_gap_len){
+				# can not merge
+				push @new_pos, $pos;
+			}else{
+				# can merge
+				pop @new_pos; # remove last seg
+				my $new_seg = $former_pos.'_'.$pos;
+				push @new_pos, $new_seg; # replace last seg with new seg
+			}
+		}else{
+			if ($pos - $former_pos > 2 * $new_gap_len){
+				push @new_pos, $pos;
+			}else{
+				pop @new_pos;
+				my $new_seg = $former_pos.'_'.$pos;
+				push @new_pos, $new_seg;
+			}
+		}
+	}
+
+	return(\@new_pos);
+}
 
