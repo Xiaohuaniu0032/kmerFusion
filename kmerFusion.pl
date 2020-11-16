@@ -4,13 +4,14 @@ use File::Basename;
 use FindBin qw/$Bin/;
 use Getopt::Long;
 
-my ($bam,$sampleName,$fa_ref,$padding_len,$outdir);
+my ($bam,$sampleName,$fa_ref,$padding_len,$softClipCount,$outdir);
 
 GetOptions(
     "bam:s"         => \$bam,                   # Need
     "n:s"           => \$sampleName,            # Need
     "fa:s"          => \$fa_ref,                # Default: </data1/database/b37/human_g1k_v37.fasta>
     "Plen:i"        => \$padding_len,           # Default: 1000
+    "clipCount:i"   => \$softClipCount,         # Default: 3
     "od:s"          => \$outdir,                # Need
     ) or die;
 
@@ -22,6 +23,11 @@ if (not defined $fa_ref){
 if (not defined $padding_len){
     $padding_len = 1000;
 }
+
+if (not defined $softClipCount){
+    $softClipCount = 3;
+}
+
 
 my $soft_clip_count = 2;
 
@@ -43,7 +49,7 @@ print RUNSH "$cmd\n";
 # filter soft clip pos
 # if a pos has <= 2 clip reads, then this pos will be filtered out
 my $soft_clip_pos_file = "$outdir/softclip.pos.txt";
-$cmd = "perl $Bin/bin/filter_sv_pos.pl $soft_clip_pos_file $sampleName $outdir";
+$cmd = "perl $Bin/bin/filter_sv_pos.pl $soft_clip_pos_file $sampleName $softClipCount $outdir";
 #system($cmd);
 print RUNSH "$cmd\n";
 
@@ -73,7 +79,7 @@ my $flist = "$outdir/fusion.csv";
 my $fq1 = "$outdir/$sampleName\.R1.fastq";
 my $fq2 = "$outdir/$sampleName\.R2.fastq";
 
-$cmd = "$Bin/genefuse -t 12 -r $fa_ref -f $flist -1 $fq1 -2 $fq2 -h $outdir/$sampleName\.genefuse.html -j $outdir/$sampleName\.genefuse.json";
+$cmd = "$Bin/genefuse -t 12 -r $fa_ref -f $flist -1 $fq1 -2 $fq2 -U -h $outdir/$sampleName\.genefuse.html -j $outdir/$sampleName\.genefuse.json";
 #system($cmd);
 print RUNSH "$cmd\n";
 
