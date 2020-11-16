@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 
-my ($infile,$name,$outdir) = @ARGV;
+my ($infile,$name,$fcount,$outdir) = @ARGV;
 
-my $fcount = 2; # default value
+#my $fcount = 3; # default value
 
 my %info;
 open IN, "$infile" or die;
@@ -30,7 +30,7 @@ foreach my $chr (keys %info){
 	my $flag = 0;
 	foreach my $pos (sort {$a <=> $b} keys %rep_pos){
 		my $n = $rep_pos{$pos};
-		if ($n >= $fcount){ # >= 2
+		if ($n >= $fcount){ # >= 3
 			# effective pos
 			$flag += 1;
 			#print "POS $pos is a OK sv pos\n";
