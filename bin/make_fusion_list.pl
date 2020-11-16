@@ -86,48 +86,38 @@ foreach my $gene (keys %genes){
 	my @pos_sort = sort {$a <=> $b} keys %{$soft_clip_pos{$gene}};
 
 	# if pos2 - pos1 > 2 * padding_len, then these two pos can not merge into one, otherwise, can merge into one new pos
-	my $merged_pos_aref = &merge_pos(\@pos_sort, $padding_len);
+	#my $merged_pos_aref = &merge_pos(\@pos_sort, $padding_len);
 
-	for my $pos (@{$merged_pos_aref}){
-		my ($pos_sort_left,$pos_sort_right);
 
-		if ($pos =~ /\_/){
-			# get first and last item
-			my @pos = split /\_/, $pos;
-			my $first_item = $pos[0];
-			my $last_item = $pos[-1];
+	my $left_pos = $pos_sort[0];
+	my $right_pos = $pos_sort[-1];
 
-			$pos_sort_left = $first_item - $padding_len;
-			$pos_sort_right = $last_item + $padding_len;
+	# do not merge pos
+	my $pos_sort_left = $left_pos - $padding_len;
+	my $pos_sort_right = $right_pos + $padding_len;
 
-			if ($pos_sort_left <= 0){
-				$pos_sort_left = 1;
-			}
-		}else{
-			# single pos
-			$pos_sort_left = $pos - $padding_len;
-			$pos_sort_right = $pos + $padding_len;
-		}
-
-		if ($pos_sort_left <= 0){
-			$pos_sort_left = 1;
-		}
-
-		# print sv region for genefuse to search
-		print O "\>$gene\,$chr\:$pos_sort_left\-$pos_sort_right\n";
-
-		# print all exon info
-		my @exon_sort = sort {$a <=> $b} keys %{$enstExonAnnotInfo{$enst}};
-		for my $e (@exon_sort){
-			my @r = split /\t/, $enstExonAnnotInfo{$enst}{$e};
-			print O "$e\,$r[0]\,$r[1]\n";
-		}
-
-		print O "\n";
+	if ($pos_sort_left <= 0){
+		$pos_sort_left = 1;
 	}
+
+	# print sv region for genefuse to search
+	print O "\>$gene\,$chr\:$pos_sort_left\-$pos_sort_right\n";
+
+	# print all exon info
+	my @exon_sort = sort {$a <=> $b} keys %{$enstExonAnnotInfo{$enst}};
+	for my $e (@exon_sort){
+		my @r = split /\t/, $enstExonAnnotInfo{$enst}{$e};
+		print O "$e\,$r[0]\,$r[1]\n";
+	}
+
+	print O "\n";
 }
 
 close O;
+
+
+
+	
 
 
 sub merge_pos{
