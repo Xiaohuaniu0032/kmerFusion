@@ -1,0 +1,2 @@
+LOC105372582,RNA gene
+LOC102724562,Pseudogene
