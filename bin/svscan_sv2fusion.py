@@ -40,29 +40,30 @@ def parse_fsDB(fs_db_file):
             g1 = fgene.split('-')[0]
             g2 = fgene.split('-')[1]
 
+            '''
+            1. EML4-ALK
+                a. <https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=180308&gid=150139>
+                b. 5' Partner Gene: EML4
+                c. 3' Partner Gene: ALK
+
+            2. ASPSCR1_ENST00000306739-TFE3
+                a. <https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=38946&gid=187223>
+                b. 5' Partner Gene: ASPSCR1 or TFE3
+                c. 3' Partner Gene: ASPSCR1 or TFE3
+            3. CDH11-USP6_ENST00000250066
+                a.
+                b.
+                c.
+            4. ARFIP1_ENST00000353617-FHDC1_ENST00000260008
+                a. https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=42327&gid=45785
+                b. 5' Partner Gene: ARFIP1
+                c. 3' Partner Gene: FHDC1
+
+
+            see </home/fulongfei/workdir/git_repo/kmerFusion/public_db/cosmic_transcript.txt.gz> for ENST_'s gene name
+            '''
+            
             if '_' in g1:
-                '''
-                1. EML4-ALK
-                    a. <https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=180308&gid=150139>
-                    b. 5' Partner Gene: EML4
-                    c. 3' Partner Gene: ALK
-
-                2. ASPSCR1_ENST00000306739-TFE3
-                    a. <https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=38946&gid=187223>
-                    b. 5' Partner Gene: ASPSCR1 or TFE3
-                    c. 3' Partner Gene: ASPSCR1 or TFE3
-                3. CDH11-USP6_ENST00000250066
-                    a.
-                    b.
-                    c.
-                4. ARFIP1_ENST00000353617-FHDC1_ENST00000260008
-                    a. https://cancer.sanger.ac.uk/cosmic/fusion/overview?fid=42327&gid=45785
-                    b. 5' Partner Gene: ARFIP1
-                    c. 3' Partner Gene: FHDC1
-
-
-                see </home/fulongfei/workdir/git_repo/kmerFusion/public_db/cosmic_transcript.txt.gz> for ENST_'s gene name
-                '''
                 g1 = g1.split('_')[0] # remove '_ENSTxxxx'
 
             if '_' in g2:
@@ -129,28 +130,24 @@ def main():
     header = ['SampleID','FusionGene','Headgene','Tailgene','FusionReadsNumber','TotalReadsNumber','FusionRate(%)','COSMIC','OncoKB','Gene1','Chr1','JunctionPosition1','Strand1','Transcript1','Region1','Gene2','Chr2','JunctionPosition2','Strand2','Transcript2','Region2','FusionSequence','SVType','svSize','insSeq','insLen','FusionOriPattern']
     of.write('\t'.join(header)+'\n')
 
+    # READ BED FILE
+    bed_gene = defaultdict(list)
+    bed_fh = open(args.bed,'r')
+    for line in bed_fh:
+        arr = line.strip().split('\t')
+        gene = line.strip().split('\t')[-1]
+        target_region = arr[1] + '\t' + arr[2] # start-end
+        bed_gene[gene].append(target_region)
+    bed_fh.close()
+
+    ### READ SV FILE
     infile = open(svfile,'r')
     next(infile) # skip header
     for line in infile:
-        # only check for INV and BND SV type
         line.strip()
         val = line.split('\t')
 
-
-        # check gene
-        bed_gene = defaultdict(list)
-        bed_fh = open(args.bed,'r')
-        for line in bed_fh:
-            arr = line.strip().split('\t')
-            gene = line.strip().split('\t')[-1]
-            target_region = arr[1] + '\t' + arr[2] # start-end
-            bed_gene[gene].append(target_region)
-
-        bed_fh.close()
-
-        #print(bed_gene)
-
-        
+        # check BED
         bp1Gene = val[-6]
         bp2Gene = val[-5]
 
@@ -184,10 +181,7 @@ def main():
         g1_flag = 0
         g2_flag = 0
 
-        #print(g1_list)
-        #print(list(set(g1_list)))
         for g in g1_list:
-            #print(g)
             g1_pos_all = bed_gene[g]
             for POS in g1_pos_all:
                 start_pos = int(POS.split('\t')[0])
@@ -203,12 +197,13 @@ def main():
                 if g2_pos >= start_pos and g2_pos <= end_pos:
                     g2_flag += 1
 
-        # check flag
+        # at least one gene's breakpoint is covered by BED
         if g1_flag > 0 or g2_flag > 0:
-            # at least one gene's breakpoint is covered by BED
             pass
         else:
+            print("%s was filtered: [at least one gene's breakpoint need to be covered by BED" % val[-4])
             continue
+
         
 
         '''
@@ -233,11 +228,14 @@ def main():
             fusion_info = i # for backward comp
             fgene = i.split('|')[0] # EML4->ALK
             
-            if fgene[0] == '-' and fgene[-1] == '-':
+            if fgene[0] == '-' or fgene[-1] == '-':
                 # skip region do not annot with genes
+                print("%s was filtered: [both breakpoint can not annot with a gene]" % val[-4])
                 continue
+
             if 'LINC' in fgene:
                 # skip non-coding gene
+                print("%s was filtered: [non-coding gene]" % val[-4])
                 continue
 
             # i's format is: TIMM23B->RET|TIMM23B,5,+|RET,3,+|2
@@ -276,10 +274,6 @@ def main():
             blist_fh.close()
 
             if hgene in blist_gene or tgene in blist_gene:
-                continue
-
-            # check '-'
-            if '-' in hgene or '-' in tgene:
                 continue
 
             # read gene annot info
@@ -334,27 +328,28 @@ def main():
             
             if hgene == tgene:
                 # skip if g1 == g2
+                print("%s was filtered: [hgene and tgene are the same]" % val[-4])
                 continue
 
             
-            #for DEL/DUP, a likely fusion transcript must:
-            #    1) the two genes' chr is the same
-            #    2) the two genes' strand is the same
+            
             
             if val[0] == 'DEL' or val[0] == 'DUP':
-                if val[3] != val[5]:
-                    # chr not same
-                    continue
-
                 hgene_strand = gene_annot_info[hgene]
                 tgene_strand = gene_annot_info[tgene]
 
                 if hgene_strand != tgene_strand:
+                    print("%s was filtered: [DEL/DUP need to on the same strand]" % val[-4])
                     continue
             
             if val[0] == 'INV' or val[0] == 'DEL' or val[0] == 'DUP':
+                # filter by chrom
+                if val[3] != val[5]:
+                    print("%s was filtered: [INV/DEL/DUP need to on the same chrom]" % val[-4])
+                    continue
                 # filter sv size
                 if int(val[1]) <= 2000:
+                    print("%s was filtered: [INV/DEL/DUP SVsize need > 2000]" % val[-4])
                     continue
 
 
@@ -384,17 +379,23 @@ def main():
             if hgene_fs_ori == '5' and tgene_fs_ori == '3':
                 pass
             else:
+                print("%s was filtered: [hgene->tgene need to be 5'->3']" % val[-4])
                 continue
-
-            # check if fusion region is annot with a gene
-            fs_pair = i.split('|')[0] # EML4->ALK
-            if fs_pair[0] == '-' or fs_pair[-1] == '-':
-                #skip
-                continue
-
             
             # fusion num/freq info
-            fnum = int(val[11])
+            #fnum = int(val[11])
+
+            # special treat for NTRK1
+            if hgene == 'NTRK1' or tgene == 'NTRK1':
+                # check fnum
+                if int(val[11]) == 0 and int(val[7]) != 0:
+                    # rate = （molRescued/(max(srRefCount, dpRefCount)+ molRescued)
+                    # molRescued == 0 but srCount != 0
+                    fnum = int(val[7])
+                else:
+                    fnum = int(val[11])
+            else:
+                fnum = int(val[11])
             
             #if fnum < 3:
             #    # fusion support DNA frag >= 3
@@ -403,13 +404,15 @@ def main():
             if int(val[7]) >= 3:
                 pass
             else:
+                print("%s was filtered: [srCount need >=3]" % val[-4])
                 continue
 
             tnum = max(int(val[12]),int(val[13])) + int(val[11])
             
-            if tnum < 30:
-                # total depth must >= 30X
-                continue
+            #if tnum < 30:
+            #    # total depth must >= 30X
+            #    print("%s was filtered: [total depth need >= 30X]" % val[-4])
+            #    continue
 
             #if 'BAI' in fgene:
                 #print(val[12])
