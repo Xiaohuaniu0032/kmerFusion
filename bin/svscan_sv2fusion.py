@@ -397,9 +397,9 @@ def main():
             else:
                 fnum = int(val[11])
             
-            #if fnum < 3:
-            #    # fusion support DNA frag >= 3
-            #    continue
+            if fnum < 3:
+                # fusion support DNA frag >= 3
+                continue
 
             if int(val[7]) >= 3:
                 pass
@@ -408,6 +408,14 @@ def main():
                 continue
 
             tnum = max(int(val[12]),int(val[13])) + int(val[11])
+
+            if hgene == 'NTRK1' or tgene == 'NTRK1':
+                # not filter by total depth
+                pass
+            else:
+                if tnum < 30:
+                    print("%s was filtered: [total depth need >= 30X]" % val[-4])
+                    continue
             
             #if tnum < 30:
             #    # total depth must >= 30X
@@ -437,7 +445,7 @@ def main():
             if fg1 in cosmic_dict or fg2 in cosmic_dict:
                 in_cosmic = 'Y'
             else:
-                in_cosmic = 'N'
+                in_cosmic = '.'
 
             # check if in oncokb
             oncokb_dict = parse_fsDB(oncokb_fgene_file)
@@ -450,7 +458,7 @@ def main():
             elif ((hgene == 'PCM1' and tgene == 'JAK2') or (hgene == 'JAK2' and tgene == 'PCM1')):
                 in_onckb = 'Y'
             else:
-                in_onckb = 'N'
+                in_onckb = '.'
 
 
             # check if paper published
@@ -458,7 +466,7 @@ def main():
             if fg1 in paper_dict or fg2 in paper_dict:
                 in_paper = 'Y'
             else:
-                in_paper = 'N'
+                in_paper = '.'
 
             # gene chr/pos info
             gene_info = {} # chr/breakpoint
