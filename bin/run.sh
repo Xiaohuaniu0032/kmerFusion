@@ -1,0 +1,1 @@
+python check_split_read_uniq.py -bam /data3/Projects/panel338/200601_A00403_0391_AH5Y7GDSXY/02_aln/BB20052909_CL01156.sv_rmdup.bam -f /home/fulongfei/workdir/fusion_work/svscan_test_20201118/BB20052909/BB20052909.fusion.xls -od $PWD >log
